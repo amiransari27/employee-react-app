@@ -1,40 +1,22 @@
 import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
+import { connect } from "react-redux";
 import EmployeelListItem from './EmployeelListItem';
-import axios from 'axios';
 import EmployeelListPagination from './EmployeeListPagination';
+import { fetchEmployees } from '../store/actions/employeeActions';
  
 
 class EmployeelList extends Component {
     constructor(props){
         super(props)
-        this.state = {
-            loading:false,
-            employeeList:[],
-            page:1,
-            pages:'',
-            total:''
-        }
         this.getEmpList = this.getEmpList.bind(this)
-        this.getEmpList(this.state.page)
+        this.getEmpList(this.props.page)
     }
-    async getEmpList (page){
-        const {data} = await axios.get(`https://reqres.in/api/users?page=${page}`)
-        this.setState({loading:true});
-        if(data.error){
-            this.setState({
-                employeeList:[],
-                loading:false
-            })
-        }else{
-            this.setState({
-                employeeList:data.data,
-                page: data.page,
-                pages: data.total_pages,
-                total: data.total,
-                loading:false
-            })
-        }
+    getEmpList (page){
+        
+        this.props.dispatch(
+            fetchEmployees(page)
+        );
     }
     render() {
        return (
@@ -50,18 +32,18 @@ class EmployeelList extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.employeeList.map(item => 
+                    {this.props.employeeList.map(item => 
                         <EmployeelListItem item={item} key={item.id.toString()} />
                     )}
                 </tbody>
             </Table>    
             
             {
-                !(this.state.loading) && 
+                !(this.props.loading) && 
                 <EmployeelListPagination 
-                    page={this.state.page}
-                    pages={this.state.pages}
-                    total={this.state.total}
+                    page={this.props.page}
+                    pages={this.props.pages}
+                    total={this.props.total}
                     onPageChange={this.getEmpList}
 
                 />
@@ -73,4 +55,13 @@ class EmployeelList extends Component {
     }
 }
 
-export default EmployeelList;
+const mapStateToProps = state => ({
+    employeeList: state.employee.items,
+    page: state.employee.page,
+    pages: state.employee.pages,
+    total: state.employee.total,
+    loading: state.employee.loading,
+    error: state.employee.error
+  });
+
+export default connect(mapStateToProps)(EmployeelList);

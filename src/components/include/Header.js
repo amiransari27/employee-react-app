@@ -5,7 +5,7 @@ class Header extends Component {
     render() {
        return (
         <Jumbotron>
-            <center><h4>React List (Pagination)</h4></center>
+            <center><h4>React List (Pagination, Redux)</h4></center>
         </Jumbotron>
        );
     }
